@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Pulse | Playlist</title>
+    <style>
+        :root {
+            --bg-dark: #0f0f12;
+            --card-bg: #1a1a24;
+            --accent-pink: #ff2d55;
+            --accent-pink-hover: #e02449;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --border-color: #2a2a3a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px 20px 20px 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff2d55 0%, #ff7b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px 40px 20px;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            height: fit-content;
+        }
+
+        .card h3 {
+            margin: 0 0 20px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #0f0f12;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-pink);
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-pink);
+            color: var(--text-main);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button.submit-btn:hover {
+            background-color: var(--accent-pink-hover);
+        }
+
+        button.submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .player-container {
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 16 / 9;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .player-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .queue-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .queue-title h3 {
+            margin: 0;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .playlist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .song-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #13131a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .song-row:hover {
+            border-color: #3e3e56;
+            transform: translateY(-2px);
+        }
+
+        .song-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+            padding-right: 16px;
+        }
+
+        .song-title-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .song-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .play-badge {
+            background-color: #2a2a3a;
+            color: #00fff0;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .play-badge:hover {
+            background-color: #00fff0;
+            color: #000;
+        }
+
+        .song-artist {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .vote-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .heart-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            transition: transform 0.2s;
+            filter: grayscale(100%) opacity(60%);
+        }
+
+        .heart-btn:hover {
+            transform: scale(1.2);
+            filter: grayscale(0%) opacity(100%);
+        }
+
+        .heart-btn.voted, .song-row:hover .heart-btn {
+            filter: grayscale(0%) opacity(100%);
+        }
+
+        .vote-count {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Party Pulse</h1>
+        <p>Crowdsource the perfect night. Submit tracks & vote up your favorites.</p>
+    </header>
+
+    <div class="container">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="card">
+                <h3>Add to Tracklist</h3>
+                <form id="addSongForm">
+                    <div class="form-group">
+                        <label for="songTitle">TRACK NAME</label>
+                        <input type="text" id="songTitle" placeholder="e.g., Midnight City" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="songArtist">ARTIST</label>
+                        <input type="text" id="songArtist" placeholder="e.g., M83" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="songUrl">YOUTUBE LINK (OPTIONAL)</label>
+                        <input type="url" id="songUrl" placeholder="https://youtube.com/watch?v=..." autocomplete="off">
+                    </div>
+                    <button type="submit" class="submit-btn">Add & Vote ❤️</button>
+                </form>
+            </div>
+
+            <div class="card" id="playerCard" style="display: none; padding: 16px;">
+                <h3 style="margin-bottom: 12px; font-size: 1rem; color: var(--text-muted);">Now Previewing</h3>
+                <div class="player-container" id="videoPlayerFrame"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="queue-title">
+                <h3>Top Tracks</h3>
+                <button class="refresh-btn" onclick="fetchPlaylist()">🔄 Refresh Queue</button>
+            </div>
+            <div id="playlistContainer" class="playlist-items">
+                <div class="empty-state">Loading party vibes...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Paste your web app execution macro deployment URL string right below
+        const API_URL = "YOUR_DEPLOYED_WEB_APP_URL_HERE";
+
+        // --- READ OPERATION ---
+        async function fetchPlaylist() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                renderPlaylist(data);
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                document.getElementById('playlistContainer').innerHTML = `<div class="empty-state" style="color:var(--accent-pink)">Failed to sync database queue.</div>`;
+            }
+        }
+
+        function renderPlaylist(songs) {
+            const container = document.getElementById('playlistContainer');
+            if (!songs || songs.length === 0) {
+                container.innerHTML = `<div class="empty-state">The queue is completely empty. Drop a link to get it jumping!</div>`;
+                return;
+            }
+
+            container.innerHTML = songs.map(song => {
+                // Parse out the standard 11-character video ID from regular or short youtube URLs
+                const videoId = extractYouTubeId(song.url);
+                const playBadge = videoId 
+                    ? `<span class="play-badge" onclick="loadVideoPlayer('${videoId}')">▶ Listen</span>` 
+                    : '';
+
+                return `
+                    <div class="song-row">
+                        <div class="song-details">
+                            <div class="song-title-line">
+                                <h4 class="song-title">${escapeHTML(song.title)}</h4>
+                                ${playBadge}
+                            </div>
+                            <p class="song-artist">${escapeHTML(song.artist)}</p>
+                        </div>
+                        <div class="vote-box">
+                            <button class="heart-btn" onclick="sendAction({action: 'upvote', song: '${song.title.replace(/'/g, "\\'")}'})">❤️</button>
+                            <span class="vote-count">${song.votes}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- WRITE TRANSACTION OPERATION ---
+        async function sendAction(payload) {
+            try {
+                // UI Snappiness Optimization (Optimistic Increment)
+                if (payload.action === 'upvote' && event) {
+                    const countSpan = event.target.nextElementSibling;
+                    if(countSpan) countSpan.innerText = Number(countSpan.innerText) + 1;
+                    event.target.classList.add('voted');
+                }
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if (result.status === "error") {
+                    alert(result.message);
+                }
+                fetchPlaylist(); // Pull correct master record sequence positionings
+            } catch (err) {
+                console.error("Action transmission crash:", err);
+            }
+        }
+
+        // --- SUBMIT HANDLING ---
+        document.getElementById('addSongForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const song = document.getElementById('songTitle').value;
+            const artist = document.getElementById('songArtist').value;
+            const url = document.getElementById('songUrl').value;
+            
+            sendAction({ action: 'add', song: song, artist: artist, url: url });
+            this.reset();
+        });
+
+        // --- EXTRACT YOUTUBE ID UTIL ---
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // --- EMBED PLAYER INTERACTIVES ---
+        function loadVideoPlayer(id) {
+            const playerCard = document.getElementById('playerCard');
+            const playerFrame = document.getElementById('videoPlayerFrame');
+            
+            playerFrame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            playerCard.style.display = 'block';
+            playerFrame.style.display = 'block';
+        }
+
+        // --- ESCAPE INJECTION SAFETY SEALS ---
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Execute dynamic playlist load immediately when window displays elements
+        fetchPlaylist();
+    </script>
+</body>
+</html>
